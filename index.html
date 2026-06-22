@@ -7,389 +7,353 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  :root {
-    --purple-50: #F3EEF9;
-    --purple-100: #D9C8EF;
-    --purple-200: #BFA1E4;
-    --purple-400: #7B4BAD;
-    --purple-600: #5A2D85;
-    --purple-700: #4D2073;
-    --purple-800: #411C65;
-    --purple-900: #2E1248;
-    --amber-50: #FAEEDA;
-    --amber-400: #BA7517;
-    --amber-600: #854F0B;
-    --gray-50: #F1EFE8;
-    --gray-100: #D3D1C7;
-    --gray-400: #888780;
-    --gray-600: #5F5E5A;
-    --gray-800: #444441;
-    --bg: #F7F6F2;
-    --white: #FFFFFF;
-    --text: #2C2C2A;
-    --text-muted: #5F5E5A;
-    --radius: 14px;
-    --radius-sm: 8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
+:root {
+  --purple-50: #F3EEF9;
+  --purple-100: #D9C8EF;
+  --purple-200: #BFA1E4;
+  --purple-400: #7B4BAD;
+  --purple-600: #5A2D85;
+  --purple-700: #4D2073;
+  --purple-800: #411C65;
+  --purple-900: #2E1248;
+  --amber-50: #FAEEDA;
+  --amber-400: #BA7517;
+  --amber-600: #854F0B;
+  --gray-50: #F1EFE8;
+  --gray-100: #D3D1C7;
+  --gray-400: #888780;
+  --gray-600: #5F5E5A;
+  --gray-800: #444441;
+  --bg: #F7F6F2;
+  --white: #FFFFFF;
+  --text: #2C2C2A;
+  --text-muted: #5F5E5A;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(65,28,101,0.07);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
 
-  .header {
-    background: var(--purple-800);
-    color: white;
-    text-align: center;
-    padding: 2.5rem 1.5rem 2rem;
-  }
-  .header-eyebrow {
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    opacity: 0.7;
-    margin-bottom: 0.5rem;
-  }
-  .header h1 {
-    font-size: clamp(20px, 5vw, 30px);
-    font-weight: 700;
-    line-height: 1.2;
-  }
-  .header-sub {
-    margin-top: 0.5rem;
-    font-size: 14px;
-    opacity: 0.8;
-  }
+/* HEADER */
+.header {
+  background: var(--purple-900);
+  color: white;
+  text-align: center;
+  padding: clamp(2rem, 5vw, 3.5rem) 1.5rem clamp(1.5rem, 4vw, 3rem);
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(123,75,173,0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 0.6rem;
+  position: relative;
+}
+.header h1 {
+  font-size: clamp(22px, 4.5vw, 34px);
+  font-weight: 700;
+  line-height: 1.2;
+  position: relative;
+  letter-spacing: -0.01em;
+}
+.header-sub {
+  margin-top: 0.5rem;
+  font-size: clamp(13px, 2vw, 15px);
+  opacity: 0.65;
+  position: relative;
+}
 
-  .container {
-    max-width: 520px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 4rem;
-  }
+/* LAYOUT */
+.page-wrap {
+  display: flex;
+  justify-content: center;
+  padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 3vw, 1.5rem) 5rem;
+}
+.container {
+  width: 100%;
+  max-width: 500px;
+}
 
-  .progress-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 1.75rem 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  .dana-label {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 0.25rem;
-  }
-  .dana-amount {
-    font-size: clamp(28px, 8vw, 40px);
-    font-weight: 700;
-    color: var(--purple-700);
-    line-height: 1.1;
-    margin-bottom: 1rem;
-  }
-  .progress-bar-wrap {
-    background: var(--purple-50);
-    border-radius: 99px;
-    height: 12px;
-    overflow: hidden;
-    margin-bottom: 1.25rem;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--purple-400), var(--purple-800));
-    border-radius: 99px;
-    transition: width 1s ease;
-  }
-  .stats-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .stat-box {
-    background: var(--gray-50);
-    border-radius: var(--radius-sm);
-    padding: 0.75rem 1rem;
-  }
-  .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
-  .stat-value { font-size: 16px; font-weight: 600; color: var(--text); }
-  .stat-box.full { grid-column: 1 / -1; }
+/* CARDS */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(1.25rem, 4vw, 2rem);
+  margin-bottom: 1rem;
+}
 
-  /* Editable target inline */
-  .stat-value-edit {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .stat-edit-input {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    border: 1.5px solid var(--purple-400);
-    border-radius: 6px;
-    padding: 2px 8px;
-    width: 130px;
-    background: white;
-    outline: none;
-    font-family: inherit;
-    display: none;
-  }
-  .stat-edit-input.visible { display: block; }
-  .btn-edit-target {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--purple-400);
-    font-size: 14px;
-    padding: 2px 4px;
-    border-radius: 4px;
-    line-height: 1;
-  }
-  .btn-edit-target:hover { background: var(--purple-50); }
+/* PROGRESS */
+.dana-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.dana-amount {
+  font-size: clamp(30px, 9vw, 44px);
+  font-weight: 700;
+  color: var(--purple-800);
+  line-height: 1.05;
+  margin-bottom: 1.1rem;
+  letter-spacing: -0.02em;
+}
+.progress-bar-wrap {
+  background: var(--purple-50);
+  border-radius: 99px;
+  height: 10px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple-400), var(--purple-800));
+  border-radius: 99px;
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
 
-  .deadline-box {
-    background: var(--amber-50);
-    border-radius: var(--radius-sm);
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .deadline-text { font-size: 13px; color: var(--amber-600); font-weight: 500; }
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stat-box {
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+}
+.stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; letter-spacing: 0.04em; }
+.stat-value { font-size: 15px; font-weight: 600; color: var(--text); }
+.stat-box.full { grid-column: 1 / -1; }
+.pct-pill {
+  display: inline-block;
+  background: var(--purple-50);
+  color: var(--purple-700);
+  border-radius: 99px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 6px;
+}
 
-  /* CARA TRANSFER BUTTON */
-  .transfer-btn-wrap { margin: 1.25rem 0 0.5rem; }
-  .btn-transfer {
-    width: 100%;
-    background: var(--purple-800);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 0.8rem 1rem;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: background 0.15s;
-  }
-  .btn-transfer:hover { background: var(--purple-700); }
+/* Target inline edit */
+.stat-value-edit { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.stat-edit-input {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  border: 1.5px solid var(--purple-400); border-radius: 6px;
+  padding: 2px 8px; width: 120px; background: white; outline: none;
+  font-family: inherit; display: none;
+}
+.stat-edit-input.visible { display: block; }
+.btn-edit-target {
+  background: none; border: none; cursor: pointer;
+  color: var(--gray-400); font-size: 13px; padding: 2px 3px;
+  border-radius: 4px; line-height: 1; opacity: 0.6;
+}
+.btn-edit-target:hover { opacity: 1; background: var(--purple-50); }
 
-  /* REKENING MODAL OVERLAY */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(65,28,101,0.45);
-    z-index: 100;
-    align-items: flex-end;
-    justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-sheet {
-    background: var(--white);
-    border-radius: 20px 20px 0 0;
-    width: 100%;
-    max-width: 520px;
-    padding: 1.5rem 1.25rem 2.5rem;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-  .modal-handle {
-    width: 40px; height: 4px;
-    background: var(--gray-100);
-    border-radius: 99px;
-    margin: 0 auto 1.25rem;
-  }
-  .modal-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 1rem;
-  }
-  .rekening-card {
-    background: var(--purple-50);
-    border-radius: var(--radius-sm);
-    padding: 1rem 1.125rem;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background 0.15s;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-  }
-  .rekening-card:hover { background: var(--purple-100); }
-  .rekening-card:last-child { margin-bottom: 0; }
-  .rek-info {}
-  .rek-bank { font-size: 11px; color: var(--purple-600); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
-  .rek-no { font-size: 18px; font-weight: 700; color: var(--purple-800); letter-spacing: 0.04em; }
-  .rek-nama { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .rek-copy { font-size: 12px; color: var(--purple-600); font-weight: 500; flex-shrink: 0; }
-  .modal-close {
-    width: 100%;
-    margin-top: 1.25rem;
-    background: none;
-    border: 1.5px solid var(--gray-100);
-    border-radius: var(--radius-sm);
-    padding: 0.65rem;
-    font-size: 14px;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-family: inherit;
-  }
+/* DEADLINE */
+.deadline-box {
+  margin-top: 12px;
+  background: var(--amber-50);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.deadline-text { font-size: 13px; color: var(--amber-600); font-weight: 500; }
 
-  .section-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin: 1.5rem 0 0.75rem;
-  }
+/* TRANSFER BUTTON */
+.btn-transfer {
+  width: 100%;
+  margin-top: 1.25rem;
+  background: var(--purple-800);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  letter-spacing: 0.01em;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-transfer:hover { background: var(--purple-700); }
+.btn-transfer:active { transform: scale(0.985); }
 
-  .donatur-list {
-    background: var(--white);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  .donatur-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0.875rem 1.25rem;
-    border-bottom: 1px solid var(--gray-50);
-  }
-  .donatur-item:last-child { border-bottom: none; }
-  .donatur-avatar {
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    background: var(--purple-50);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 600;
-    color: var(--purple-700);
-    flex-shrink: 0;
-  }
-  .donatur-info { flex: 1; min-width: 0; }
-  .donatur-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .donatur-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-  .donatur-nominal { font-size: 14px; font-weight: 600; color: var(--purple-700); flex-shrink: 0; }
-  .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 14px; }
+/* MODAL — bottom sheet, no position:fixed */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(46,18,72,0.5);
+  z-index: 200;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.modal-sheet {
+  background: var(--white);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 520px;
+  padding: 1.25rem 1.25rem 3rem;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-handle {
+  width: 36px; height: 4px;
+  background: var(--gray-100);
+  border-radius: 99px;
+  margin: 0 auto 1.25rem;
+}
+.modal-title { font-size: 15px; font-weight: 700; margin-bottom: 1rem; }
+.rekening-card {
+  background: var(--purple-50);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.125rem;
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  transition: background 0.15s;
+}
+.rekening-card:hover { background: var(--purple-100); }
+.rek-bank { font-size: 10px; color: var(--purple-600); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+.rek-no { font-size: 20px; font-weight: 700; color: var(--purple-800); letter-spacing: 0.06em; }
+.rek-nama { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.rek-copy { font-size: 12px; color: var(--purple-600); font-weight: 500; flex-shrink: 0; white-space: nowrap; }
+.modal-close {
+  width: 100%; margin-top: 1rem;
+  background: none; border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius-sm); padding: 0.65rem;
+  font-size: 14px; color: var(--text-muted);
+  cursor: pointer; font-family: inherit;
+  transition: border-color 0.15s;
+}
+.modal-close:hover { border-color: var(--gray-400); }
 
-  .admin-toggle { text-align: center; margin-top: 2.5rem; }
-  .btn-admin {
-    background: none;
-    border: 1.5px solid var(--gray-100);
-    color: var(--text-muted);
-    border-radius: 99px;
-    padding: 0.5rem 1.25rem;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .btn-admin:hover { border-color: var(--purple-400); color: var(--purple-700); }
+/* ADMIN */
+.admin-toggle { text-align: center; margin-top: 2.5rem; }
+.btn-admin {
+  background: none;
+  border: 1.5px solid var(--gray-100);
+  color: var(--text-muted);
+  border-radius: 99px;
+  padding: 0.45rem 1.25rem;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.btn-admin:hover { border-color: var(--purple-400); color: var(--purple-700); }
 
-  .admin-panel {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    display: none;
-  }
-  .admin-panel.open { display: block; }
-  .admin-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; color: var(--text); }
+.admin-panel {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: clamp(1.25rem, 4vw, 1.75rem);
+  margin-top: 1rem;
+  box-shadow: var(--shadow);
+  display: none;
+}
+.admin-panel.open { display: block; }
+.admin-title { font-size: 15px; font-weight: 700; margin-bottom: 1rem; }
 
-  .form-group { margin-bottom: 1rem; }
-  .form-label {
-    display: block; font-size: 12px; font-weight: 600;
-    color: var(--text-muted); text-transform: uppercase;
-    letter-spacing: 0.06em; margin-bottom: 6px;
-  }
-  input[type="text"], input[type="number"], input[type="password"], input[type="date"], select, textarea {
-    width: 100%; padding: 0.6rem 0.875rem;
-    border: 1.5px solid var(--gray-100);
-    border-radius: var(--radius-sm);
-    font-size: 14px; color: var(--text);
-    background: var(--bg); outline: none;
-    transition: border-color 0.15s;
-    font-family: inherit;
-  }
-  input:focus, select:focus, textarea:focus { border-color: var(--purple-400); }
+.form-group { margin-bottom: 1rem; }
+.form-label {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.07em; margin-bottom: 6px;
+}
+input[type="text"], input[type="number"], input[type="password"], input[type="date"], select, textarea {
+  width: 100%; padding: 0.6rem 0.875rem;
+  border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius-sm);
+  font-size: 14px; color: var(--text);
+  background: var(--bg); outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--purple-400); }
 
-  .btn-primary {
-    width: 100%; background: var(--purple-700); color: white;
-    border: none; border-radius: var(--radius-sm); padding: 0.75rem;
-    font-size: 15px; font-weight: 600; cursor: pointer;
-    transition: background 0.15s; font-family: inherit;
-  }
-  .btn-primary:hover { background: var(--purple-800); }
-  .btn-secondary {
-    width: 100%; background: none; color: var(--purple-700);
-    border: 1.5px solid var(--purple-100); border-radius: var(--radius-sm);
-    padding: 0.65rem; font-size: 14px; font-weight: 500; cursor: pointer;
-    margin-top: 8px; font-family: inherit; transition: all 0.15s;
-  }
-  .btn-secondary:hover { background: var(--purple-50); }
+/* PASSWORD FIELD */
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 2.75rem; }
+.pw-toggle {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--gray-400); padding: 4px; line-height: 0;
+  transition: color 0.15s;
+}
+.pw-toggle:hover { color: var(--purple-600); }
+.pw-toggle svg { display: block; }
 
-  .divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 1rem 0; color: var(--text-muted); font-size: 12px;
-  }
-  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
+.btn-primary {
+  width: 100%; background: var(--purple-700); color: white;
+  border: none; border-radius: var(--radius-sm); padding: 0.75rem;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: background 0.15s; font-family: inherit;
+}
+.btn-primary:hover { background: var(--purple-800); }
+.btn-secondary {
+  width: 100%; background: none; color: var(--purple-700);
+  border: 1.5px solid var(--purple-100); border-radius: var(--radius-sm);
+  padding: 0.65rem; font-size: 14px; font-weight: 500; cursor: pointer;
+  margin-top: 8px; font-family: inherit; transition: all 0.15s;
+}
+.btn-secondary:hover { background: var(--purple-50); }
 
-  .admin-section-title {
-    font-size: 13px; font-weight: 600; color: var(--text-muted);
-    margin: 1.25rem 0 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
-  }
-  .settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 1rem 0; color: var(--text-muted); font-size: 12px;
+}
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
 
-  .toast {
-    position: fixed; bottom: 1.5rem; left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: var(--purple-800); color: white;
-    padding: 0.75rem 1.5rem; border-radius: 99px;
-    font-size: 14px; font-weight: 500; transition: transform 0.3s;
-    z-index: 9999; white-space: nowrap;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
+.admin-section-title {
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  margin: 1.25rem 0 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-  .tag {
-    display: inline-block; background: var(--purple-50);
-    color: var(--purple-700); border-radius: 99px;
-    padding: 2px 10px; font-size: 11px; font-weight: 600; margin-left: 6px;
-  }
-  .file-drop {
-    border: 2px dashed var(--gray-100); border-radius: var(--radius-sm);
-    padding: 1.25rem; text-align: center; cursor: pointer;
-    transition: border-color 0.15s; font-size: 13px; color: var(--text-muted);
-  }
-  .file-drop:hover { border-color: var(--purple-400); color: var(--purple-700); }
-  .file-drop input { display: none; }
+.file-drop {
+  border: 2px dashed var(--gray-100); border-radius: var(--radius-sm);
+  padding: 1.25rem; text-align: center; cursor: pointer;
+  transition: border-color 0.15s; font-size: 13px; color: var(--text-muted);
+  display: block;
+}
+.file-drop:hover { border-color: var(--purple-400); color: var(--purple-700); }
+.file-drop input { display: none; }
 
-  .show-more {
-    text-align: center; padding: 0.875rem;
-    border-top: 1px solid var(--gray-50);
-    font-size: 13px; color: var(--purple-600);
-    cursor: pointer; font-weight: 500;
-  }
-  .show-more:hover { color: var(--purple-800); }
-
-  .pct-badge {
-    display: inline-block;
-    background: var(--purple-50);
-    color: var(--purple-700);
-    border-radius: 99px;
-    padding: 2px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-left: 8px;
-  }
+/* TOAST */
+.toast {
+  position: fixed; bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: var(--purple-900); color: white;
+  padding: 0.75rem 1.5rem; border-radius: 99px;
+  font-size: 14px; font-weight: 500; transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  z-index: 9999; white-space: nowrap; pointer-events: none;
+  box-shadow: 0 4px 20px rgba(46,18,72,0.25);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -400,56 +364,57 @@
   <div class="header-sub" id="campaign-sub">Bersama kita wujudkan amal jariyah yang terus mengalir</div>
 </div>
 
+<div class="page-wrap">
 <div class="container">
 
   <!-- PROGRESS CARD -->
-  <div class="progress-card">
+  <div class="card">
     <div class="dana-label">Dana Terkumpul</div>
     <div class="dana-amount" id="total-dana">Rp 0</div>
     <div class="progress-bar-wrap">
       <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
     </div>
+
     <div class="stats-row">
+      <!-- TARGET -->
       <div class="stat-box">
         <div class="stat-label">🎯 Target</div>
         <div class="stat-value">
           <div class="stat-value-edit" id="target-display-wrap">
             <span id="target-display">Rp 50.000.000</span>
-            <span class="pct-badge" id="pct-badge">0%</span>
-            <button class="btn-edit-target" onclick="startEditTarget()" title="Edit target" id="edit-target-btn">✏️</button>
+            <span class="pct-pill" id="pct-badge">0%</span>
+            <button class="btn-edit-target" onclick="startEditTarget()" id="edit-target-btn" title="Edit target" style="display:none">✏️</button>
           </div>
           <input class="stat-edit-input" id="target-input" type="number" placeholder="50000000"
             onkeydown="if(event.key==='Enter')saveTarget();if(event.key==='Escape')cancelEditTarget()"
             onblur="saveTarget()">
         </div>
       </div>
+
+      <!-- DONATUR COUNT -->
       <div class="stat-box">
         <div class="stat-label">👥 Donatur</div>
         <div class="stat-value" id="donatur-count">0</div>
       </div>
+
+      <!-- ALUMNI RATIO -->
       <div class="stat-box full" id="alumni-stat-box" style="display:none">
         <div class="stat-label">📋 Alumni Berpartisipasi</div>
         <div class="stat-value" id="alumni-ratio">0 / 0</div>
       </div>
     </div>
+
+    <!-- DEADLINE -->
     <div class="deadline-box" id="deadline-box" style="display:none">
-      <span style="font-size:20px">🕐</span>
+      <span style="font-size:18px">🕐</span>
       <span class="deadline-text" id="deadline-text"></span>
     </div>
-    <!-- CARA TRANSFER BUTTON -->
-    <div class="transfer-btn-wrap">
-      <button class="btn-transfer" onclick="openModal()">
-        🏦 Cara Transfer / Rekening Tujuan
-      </button>
-    </div>
-  </div>
 
-  <!-- DONATUR LIST -->
-  <div class="section-title" style="margin-top:1.5rem">Daftar Donatur <span class="tag" id="donatur-tag">0</span></div>
-  <div class="donatur-list" id="donatur-list">
-    <div class="empty-state">Belum ada data donatur.<br>Import dari spreadsheet di bawah.</div>
+    <!-- TRANSFER BUTTON -->
+    <button class="btn-transfer" onclick="openModal()">
+      🏦 Cara Transfer &amp; Rekening Tujuan
+    </button>
   </div>
-  <div class="show-more" id="show-more" style="display:none" onclick="toggleShowAll()">Lihat semua donatur ↓</div>
 
   <!-- ADMIN TOGGLE -->
   <div class="admin-toggle">
@@ -461,8 +426,15 @@
     <div class="admin-title">Login Admin</div>
     <div class="form-group">
       <label class="form-label">Password</label>
-      <input type="password" id="admin-password" placeholder="Masukkan password admin"
-        onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="pw-wrap">
+        <input type="password" id="admin-password" placeholder="Masukkan password admin"
+          onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="pw-toggle" type="button" onclick="togglePw('admin-password', this)" aria-label="Tampilkan password">
+          <svg id="eye-icon-admin-password" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
     </div>
     <button class="btn-primary" onclick="doLogin()">Masuk</button>
   </div>
@@ -494,13 +466,16 @@
 
     <div class="admin-section-title">Rekening Tujuan</div>
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5">
-      Rekening ini akan tampil di modal "Cara Transfer" di halaman utama.
+      Rekening ini tampil di modal "Cara Transfer" di halaman publik.
     </div>
     <div id="rekening-list"></div>
     <button class="btn-secondary" onclick="addRekening()">+ Tambah Rekening</button>
     <button class="btn-secondary" onclick="saveRekening()" style="margin-top:6px;background:var(--purple-50)">💾 Simpan Rekening</button>
 
     <div class="admin-section-title" style="margin-top:1.5rem">Import Data Donatur</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.6">
+      Data donatur hanya terlihat di panel admin. Di halaman publik hanya tampil jumlah donatur &amp; total dana.
+    </div>
 
     <div class="divider">via Google Sheets</div>
     <div class="form-group">
@@ -509,20 +484,17 @@
     </div>
     <button class="btn-secondary" onclick="importGSheet()">📥 Import dari Google Sheets</button>
     <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6">
-      Cara publish: buka Google Sheets → File → Share → Publish to web → pilih sheet → pilih CSV → klik Publish → copy link-nya ke sini.<br>
-      <strong>Catatan:</strong> Setiap ada update di spreadsheet, kamu perlu klik Import ulang.
+      File → Share → Publish to web → pilih sheet → pilih CSV → copy link ke sini. Klik Import ulang setiap ada update.
     </div>
 
     <div class="divider">atau upload file</div>
-    <label class="file-drop" id="file-drop-label">
+    <label class="file-drop">
       <input type="file" id="file-upload" accept=".csv,.xlsx,.xls" onchange="handleFileUpload(this)">
       📂 Klik untuk upload CSV atau Excel (.xlsx)
     </label>
 
-    <div style="margin-top:1.5rem">
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">
-        Format kolom: <code>nama</code>, <code>nominal</code>, <code>tanggal</code>, <code>kampus</code>, <code>no_wa</code>
-      </div>
+    <div style="margin-top:1rem;font-size:12px;color:var(--text-muted)">
+      Format kolom: <code>nama</code>, <code>nominal</code>, <code>tanggal</code>, <code>kampus</code>, <code>no_wa</code>
     </div>
 
     <div class="divider">atau tambah manual</div>
@@ -542,7 +514,7 @@
     </div>
     <div class="settings-row">
       <div class="form-group">
-        <label class="form-label">Kampus/Kota</label>
+        <label class="form-label">Kampus / Kota</label>
         <input type="text" id="add-kampus" placeholder="Universitas / Kota">
       </div>
       <div class="form-group">
@@ -551,13 +523,19 @@
       </div>
     </div>
     <button class="btn-primary" onclick="addManual()">+ Tambah Donatur</button>
-    <button class="btn-secondary" onclick="clearData()" style="margin-top:12px;color:#A32D2D;border-color:#F7C1C1">🗑 Hapus Semua Data Donatur</button>
+
+    <div class="admin-section-title" style="margin-top:1.5rem">Data Donatur <span id="donor-count-admin" style="color:var(--purple-600)">(0)</span></div>
+    <div id="admin-donor-list" style="font-size:13px;color:var(--text-muted);text-align:center;padding:1rem 0">Belum ada data.</div>
+
+    <button class="btn-secondary" onclick="clearData()" style="margin-top:1rem;color:#A32D2D;border-color:#F7C1C1">🗑 Hapus Semua Data Donatur</button>
+    <button class="btn-secondary" onclick="doLogout()" style="margin-top:8px">Keluar</button>
   </div>
 
 </div>
+</div>
 
 <!-- REKENING MODAL -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+<div class="modal-backdrop" id="modal-overlay" onclick="closeModalOutside(event)">
   <div class="modal-sheet" id="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">🏦 Rekening Tujuan Wakaf</div>
@@ -583,8 +561,8 @@ let settings = {
     { bank: 'BRI', no: '0987654321', nama: 'Yayasan Alumni' }
   ]
 };
-let showAll = false;
 let editingTarget = false;
+let isAdmin = false;
 
 function load() {
   const d = localStorage.getItem('wakaf_donors');
@@ -603,10 +581,6 @@ function fmt(n) {
   return 'Rp ' + Math.round(n).toLocaleString('id-ID');
 }
 
-function initials(name) {
-  return name.trim().split(' ').slice(0,2).map(w => w[0]?.toUpperCase() || '').join('');
-}
-
 function render() {
   document.getElementById('campaign-title').textContent = settings.title;
   document.getElementById('campaign-sub').textContent = settings.sub;
@@ -619,7 +593,6 @@ function render() {
   document.getElementById('target-display').textContent = fmt(settings.target);
   document.getElementById('pct-badge').textContent = pct.toFixed(1) + '%';
   document.getElementById('donatur-count').textContent = donors.length;
-  document.getElementById('donatur-tag').textContent = donors.length;
 
   setTimeout(() => {
     document.getElementById('progress-fill').style.width = pct.toFixed(1) + '%';
@@ -628,22 +601,42 @@ function render() {
   if (settings.totalAlumni > 0) {
     document.getElementById('alumni-stat-box').style.display = '';
     document.getElementById('alumni-ratio').textContent = donors.length + ' / ' + settings.totalAlumni + ' alumni';
+  } else {
+    document.getElementById('alumni-stat-box').style.display = 'none';
   }
 
   if (settings.deadline) {
     const days = Math.ceil((new Date(settings.deadline) - new Date()) / 86400000);
     if (days > 0) {
       document.getElementById('deadline-box').style.display = '';
-      document.getElementById('deadline-text').textContent = days + ' Hari Lagi (Sampai ' +
-        new Date(settings.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + ')';
+      document.getElementById('deadline-text').textContent = days + ' hari lagi — sampai ' +
+        new Date(settings.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    } else {
+      document.getElementById('deadline-box').style.display = 'none';
     }
   }
 
-  renderDonors();
+  if (isAdmin) renderAdminDonors();
 }
 
-/* ---- INLINE TARGET EDIT ---- */
+/* ---- PASSWORD TOGGLE ---- */
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  const icon = btn.querySelector('svg');
+  if (isHidden) {
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    btn.setAttribute('aria-label', 'Sembunyikan password');
+  } else {
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    btn.setAttribute('aria-label', 'Tampilkan password');
+  }
+}
+
+/* ---- INLINE TARGET EDIT (admin only) ---- */
 function startEditTarget() {
+  if (!isAdmin) return;
   editingTarget = true;
   document.getElementById('target-display').style.display = 'none';
   document.getElementById('pct-badge').style.display = 'none';
@@ -651,8 +644,7 @@ function startEditTarget() {
   const input = document.getElementById('target-input');
   input.value = settings.target;
   input.classList.add('visible');
-  input.focus();
-  input.select();
+  input.focus(); input.select();
 }
 
 function saveTarget() {
@@ -663,9 +655,8 @@ function saveTarget() {
   document.getElementById('target-input').classList.remove('visible');
   document.getElementById('target-display').style.display = '';
   document.getElementById('pct-badge').style.display = '';
-  document.getElementById('edit-target-btn').style.display = '';
-  render();
-  toast('Target diperbarui!');
+  if (isAdmin) document.getElementById('edit-target-btn').style.display = '';
+  render(); toast('Target diperbarui!');
 }
 
 function cancelEditTarget() {
@@ -673,10 +664,10 @@ function cancelEditTarget() {
   document.getElementById('target-input').classList.remove('visible');
   document.getElementById('target-display').style.display = '';
   document.getElementById('pct-badge').style.display = '';
-  document.getElementById('edit-target-btn').style.display = '';
+  if (isAdmin) document.getElementById('edit-target-btn').style.display = '';
 }
 
-/* ---- MODAL REKENING ---- */
+/* ---- MODAL ---- */
 function openModal() {
   renderModalRekening();
   document.getElementById('modal-overlay').classList.add('open');
@@ -696,8 +687,8 @@ function renderModalRekening() {
     return;
   }
   el.innerHTML = settings.rekening.map(r => `
-    <div class="rekening-card" onclick="copyText('${r.no}', '${r.bank}')">
-      <div class="rek-info">
+    <div class="rekening-card" onclick="copyText('${r.no}','${r.bank}')">
+      <div>
         <div class="rek-bank">${r.bank}</div>
         <div class="rek-no">${r.no}</div>
         <div class="rek-nama">a.n. ${r.nama}</div>
@@ -725,19 +716,34 @@ function toggleAdminLogin() {
   const lp = document.getElementById('login-panel');
   const ap = document.getElementById('admin-panel');
   if (ap.classList.contains('open')) { ap.classList.remove('open'); lp.classList.remove('open'); return; }
+  if (isAdmin) { ap.classList.toggle('open'); return; }
   lp.classList.toggle('open');
+  if (lp.classList.contains('open')) {
+    setTimeout(() => document.getElementById('admin-password').focus(), 50);
+  }
 }
 
 function doLogin() {
   const pw = document.getElementById('admin-password').value;
   if (pw === ADMIN_PASS) {
+    isAdmin = true;
     document.getElementById('login-panel').classList.remove('open');
     document.getElementById('admin-panel').classList.add('open');
+    document.getElementById('edit-target-btn').style.display = '';
     loadAdminForm();
+    render();
     toast('Selamat datang, Admin!');
   } else {
     toast('Password salah.');
   }
+}
+
+function doLogout() {
+  isAdmin = false;
+  document.getElementById('admin-panel').classList.remove('open');
+  document.getElementById('edit-target-btn').style.display = 'none';
+  document.getElementById('admin-password').value = '';
+  toast('Sudah keluar.');
 }
 
 function loadAdminForm() {
@@ -763,7 +769,7 @@ function renderRekeningAdmin() {
     <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center">
       <input type="text" value="${r.bank}" placeholder="Nama Bank" id="rek-bank-${i}">
       <input type="text" value="${r.no}" placeholder="No. Rekening" id="rek-no-${i}">
-      <button onclick="removeRek(${i})" style="background:none;border:none;color:#A32D2D;cursor:pointer;font-size:18px;padding:0 4px">×</button>
+      <button onclick="removeRek(${i})" style="background:none;border:none;color:#A32D2D;cursor:pointer;font-size:20px;padding:0 4px;line-height:1">×</button>
       <input type="text" value="${r.nama}" placeholder="Nama pemilik rekening" id="rek-nama-${i}" style="grid-column:1/3">
     </div>
   `).join('');
@@ -776,49 +782,38 @@ function saveRekening() {
     settings.rekening[i].no   = document.getElementById('rek-no-' + i)?.value || '';
     settings.rekening[i].nama = document.getElementById('rek-nama-' + i)?.value || '';
   }
-  save();
-  toast('Rekening disimpan!');
+  save(); toast('Rekening disimpan!');
 }
 
 function removeRek(i) { settings.rekening.splice(i, 1); save(); renderRekeningAdmin(); }
-function addRekening() {
-  settings.rekening.push({ bank: '', no: '', nama: '' });
-  renderRekeningAdmin();
-}
+function addRekening() { settings.rekening.push({ bank: '', no: '', nama: '' }); renderRekeningAdmin(); }
 
-/* ---- DONORS ---- */
-function renderDonors() {
-  const list = document.getElementById('donatur-list');
-  const sorted = [...donors].sort((a, b) => (parseFloat(b.nominal) || 0) - (parseFloat(a.nominal) || 0));
-  const shown = showAll ? sorted : sorted.slice(0, 8);
-
+/* ---- ADMIN DONOR LIST ---- */
+function fmt2(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+function renderAdminDonors() {
+  const el = document.getElementById('admin-donor-list');
+  document.getElementById('donor-count-admin').textContent = '(' + donors.length + ')';
   if (donors.length === 0) {
-    list.innerHTML = '<div class="empty-state">Belum ada data donatur.<br>Import dari spreadsheet di bawah.</div>';
-    document.getElementById('show-more').style.display = 'none';
+    el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--text-muted)">Belum ada data.</div>';
     return;
   }
-
-  list.innerHTML = shown.map(d => `
-    <div class="donatur-item">
-      <div class="donatur-avatar">${initials(d.nama || '?')}</div>
-      <div class="donatur-info">
-        <div class="donatur-name">${d.nama || '-'}</div>
-        <div class="donatur-meta">${d.kampus || ''} ${d.tanggal ? '· ' + new Date(d.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : ''}</div>
+  const sorted = [...donors].sort((a, b) => (parseFloat(b.nominal)||0) - (parseFloat(a.nominal)||0));
+  el.innerHTML = '<div style="background:var(--gray-50);border-radius:var(--radius-sm);overflow:hidden">' +
+    sorted.map((d, i) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:0.7rem 1rem;border-bottom:1px solid var(--gray-100);font-size:13px${i===sorted.length-1?';border-bottom:none':''}">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--purple-50);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--purple-700);flex-shrink:0">${initials(d.nama||'?')}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.nama||'-'}</div>
+          <div style="color:var(--text-muted);font-size:11px">${d.kampus||''} ${d.tanggal ? '· ' + new Date(d.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'short'}) : ''}</div>
+        </div>
+        <div style="font-weight:600;color:var(--purple-700);flex-shrink:0">${fmt2(d.nominal||0)}</div>
       </div>
-      <div class="donatur-nominal">${fmt(d.nominal || 0)}</div>
-    </div>
-  `).join('');
-
-  const sm = document.getElementById('show-more');
-  if (donors.length > 8) {
-    sm.style.display = '';
-    sm.textContent = showAll ? 'Tampilkan lebih sedikit ↑' : `Lihat semua ${donors.length} donatur ↓`;
-  } else {
-    sm.style.display = 'none';
-  }
+    `).join('') + '</div>';
 }
 
-function toggleShowAll() { showAll = !showAll; renderDonors(); }
+function initials(name) {
+  return name.trim().split(' ').slice(0,2).map(w => w[0]?.toUpperCase()||'').join('');
+}
 
 /* ---- IMPORT ---- */
 function normalizeKey(k) {
@@ -859,11 +854,8 @@ function importGSheet() {
   toast('Mengambil data...');
   fetch(csvUrl)
     .then(r => r.text())
-    .then(text => {
-      const result = Papa.parse(text, { skipEmptyLines: true });
-      parseRows(result.data);
-    })
-    .catch(() => toast('Gagal mengambil data. Pastikan sheet sudah di-publish sebagai CSV.'));
+    .then(text => { const result = Papa.parse(text, { skipEmptyLines: true }); parseRows(result.data); })
+    .catch(() => toast('Gagal. Pastikan sheet sudah di-publish sebagai CSV.'));
 }
 
 function handleFileUpload(input) {
