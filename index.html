@@ -3,16 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wakaf Alumni Tracker</title>
+<title>Wakaf Alumni 2011 Gontor Putri</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
-    --teal-50: #E1F5EE;
-    --teal-100: #9FE1CB;
-    --teal-400: #1D9E75;
-    --teal-600: #0F6E56;
-    --teal-800: #085041;
+    --purple-50: #F3EEF9;
+    --purple-100: #D9C8EF;
+    --purple-200: #BFA1E4;
+    --purple-400: #7B4BAD;
+    --purple-600: #5A2D85;
+    --purple-700: #4D2073;
+    --purple-800: #411C65;
+    --purple-900: #2E1248;
     --amber-50: #FAEEDA;
     --amber-400: #BA7517;
     --amber-600: #854F0B;
@@ -36,9 +39,8 @@
     min-height: 100vh;
   }
 
-  /* HEADER */
   .header {
-    background: var(--teal-600);
+    background: var(--purple-800);
     color: white;
     text-align: center;
     padding: 2.5rem 1.5rem 2rem;
@@ -47,11 +49,11 @@
     font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    opacity: 0.75;
+    opacity: 0.7;
     margin-bottom: 0.5rem;
   }
   .header h1 {
-    font-size: clamp(22px, 5vw, 32px);
+    font-size: clamp(20px, 5vw, 30px);
     font-weight: 700;
     line-height: 1.2;
   }
@@ -61,14 +63,12 @@
     opacity: 0.8;
   }
 
-  /* MAIN CONTAINER */
   .container {
     max-width: 520px;
     margin: 0 auto;
     padding: 1.5rem 1rem 4rem;
   }
 
-  /* PROGRESS CARD */
   .progress-card {
     background: var(--white);
     border-radius: var(--radius);
@@ -84,12 +84,12 @@
   .dana-amount {
     font-size: clamp(28px, 8vw, 40px);
     font-weight: 700;
-    color: var(--teal-400);
+    color: var(--purple-700);
     line-height: 1.1;
     margin-bottom: 1rem;
   }
   .progress-bar-wrap {
-    background: var(--teal-50);
+    background: var(--purple-50);
     border-radius: 99px;
     height: 12px;
     overflow: hidden;
@@ -97,7 +97,7 @@
   }
   .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--teal-400), var(--teal-600));
+    background: linear-gradient(90deg, var(--purple-400), var(--purple-800));
     border-radius: 99px;
     transition: width 1s ease;
   }
@@ -112,17 +112,42 @@
     border-radius: var(--radius-sm);
     padding: 0.75rem 1rem;
   }
-  .stat-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 2px;
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+  .stat-value { font-size: 16px; font-weight: 600; color: var(--text); }
+  .stat-box.full { grid-column: 1 / -1; }
+
+  /* Editable target inline */
+  .stat-value-edit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .stat-value {
-    font-size: 16px;
+  .stat-edit-input {
+    font-size: 14px;
     font-weight: 600;
     color: var(--text);
+    border: 1.5px solid var(--purple-400);
+    border-radius: 6px;
+    padding: 2px 8px;
+    width: 130px;
+    background: white;
+    outline: none;
+    font-family: inherit;
+    display: none;
   }
-  .stat-box.full { grid-column: 1 / -1; }
+  .stat-edit-input.visible { display: block; }
+  .btn-edit-target {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--purple-400);
+    font-size: 14px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    line-height: 1;
+  }
+  .btn-edit-target:hover { background: var(--purple-50); }
+
   .deadline-box {
     background: var(--amber-50);
     border-radius: var(--radius-sm);
@@ -131,12 +156,93 @@
     align-items: center;
     gap: 10px;
   }
-  .deadline-icon {
-    font-size: 20px;
-  }
   .deadline-text { font-size: 13px; color: var(--amber-600); font-weight: 500; }
 
-  /* PAYMENT INFO */
+  /* CARA TRANSFER BUTTON */
+  .transfer-btn-wrap { margin: 1.25rem 0 0.5rem; }
+  .btn-transfer {
+    width: 100%;
+    background: var(--purple-800);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 1rem;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s;
+  }
+  .btn-transfer:hover { background: var(--purple-700); }
+
+  /* REKENING MODAL OVERLAY */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(65,28,101,0.45);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 520px;
+    padding: 1.5rem 1.25rem 2.5rem;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--gray-100);
+    border-radius: 99px;
+    margin: 0 auto 1.25rem;
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+  .rekening-card {
+    background: var(--purple-50);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.125rem;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .rekening-card:hover { background: var(--purple-100); }
+  .rekening-card:last-child { margin-bottom: 0; }
+  .rek-info {}
+  .rek-bank { font-size: 11px; color: var(--purple-600); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+  .rek-no { font-size: 18px; font-weight: 700; color: var(--purple-800); letter-spacing: 0.04em; }
+  .rek-nama { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .rek-copy { font-size: 12px; color: var(--purple-600); font-weight: 500; flex-shrink: 0; }
+  .modal-close {
+    width: 100%;
+    margin-top: 1.25rem;
+    background: none;
+    border: 1.5px solid var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem;
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+  }
+
   .section-title {
     font-size: 13px;
     font-weight: 600;
@@ -145,43 +251,7 @@
     letter-spacing: 0.08em;
     margin: 1.5rem 0 0.75rem;
   }
-  .payment-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .payment-card {
-    background: var(--white);
-    border-radius: var(--radius-sm);
-    padding: 0.75rem 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: box-shadow 0.15s;
-  }
-  .payment-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  .payment-bank {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-  }
-  .payment-no {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: 0.02em;
-  }
-  .payment-name {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 2px;
-  }
-  .copy-hint {
-    font-size: 11px;
-    color: var(--teal-400);
-    margin-top: 4px;
-  }
 
-  /* DONATUR LIST */
   .donatur-list {
     background: var(--white);
     border-radius: var(--radius);
@@ -197,50 +267,21 @@
   }
   .donatur-item:last-child { border-bottom: none; }
   .donatur-avatar {
-    width: 38px;
-    height: 38px;
+    width: 38px; height: 38px;
     border-radius: 50%;
-    background: var(--teal-50);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--teal-600);
+    background: var(--purple-50);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    color: var(--purple-700);
     flex-shrink: 0;
   }
   .donatur-info { flex: 1; min-width: 0; }
-  .donatur-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .donatur-meta {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 1px;
-  }
-  .donatur-nominal {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--teal-600);
-    flex-shrink: 0;
-  }
-  .empty-state {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
+  .donatur-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .donatur-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .donatur-nominal { font-size: 14px; font-weight: 600; color: var(--purple-700); flex-shrink: 0; }
+  .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 14px; }
 
-  /* ADMIN PANEL */
-  .admin-toggle {
-    text-align: center;
-    margin-top: 2.5rem;
-  }
+  .admin-toggle { text-align: center; margin-top: 2.5rem; }
   .btn-admin {
     background: none;
     border: 1.5px solid var(--gray-100);
@@ -251,7 +292,7 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-  .btn-admin:hover { border-color: var(--teal-400); color: var(--teal-600); }
+  .btn-admin:hover { border-color: var(--purple-400); color: var(--purple-700); }
 
   .admin-panel {
     background: var(--white);
@@ -262,154 +303,100 @@
     display: none;
   }
   .admin-panel.open { display: block; }
-  .admin-title {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text);
-  }
+  .admin-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; color: var(--text); }
 
   .form-group { margin-bottom: 1rem; }
   .form-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 6px;
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 6px;
   }
   input[type="text"], input[type="number"], input[type="password"], input[type="date"], select, textarea {
-    width: 100%;
-    padding: 0.6rem 0.875rem;
+    width: 100%; padding: 0.6rem 0.875rem;
     border: 1.5px solid var(--gray-100);
     border-radius: var(--radius-sm);
-    font-size: 14px;
-    color: var(--text);
-    background: var(--bg);
-    outline: none;
+    font-size: 14px; color: var(--text);
+    background: var(--bg); outline: none;
     transition: border-color 0.15s;
     font-family: inherit;
   }
-  input:focus, select:focus, textarea:focus { border-color: var(--teal-400); }
+  input:focus, select:focus, textarea:focus { border-color: var(--purple-400); }
 
   .btn-primary {
-    width: 100%;
-    background: var(--teal-400);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 0.75rem;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
-    font-family: inherit;
+    width: 100%; background: var(--purple-700); color: white;
+    border: none; border-radius: var(--radius-sm); padding: 0.75rem;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: background 0.15s; font-family: inherit;
   }
-  .btn-primary:hover { background: var(--teal-600); }
+  .btn-primary:hover { background: var(--purple-800); }
   .btn-secondary {
-    width: 100%;
-    background: none;
-    color: var(--teal-600);
-    border: 1.5px solid var(--teal-100);
-    border-radius: var(--radius-sm);
-    padding: 0.65rem;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 8px;
-    font-family: inherit;
-    transition: all 0.15s;
+    width: 100%; background: none; color: var(--purple-700);
+    border: 1.5px solid var(--purple-100); border-radius: var(--radius-sm);
+    padding: 0.65rem; font-size: 14px; font-weight: 500; cursor: pointer;
+    margin-top: 8px; font-family: inherit; transition: all 0.15s;
   }
-  .btn-secondary:hover { background: var(--teal-50); }
+  .btn-secondary:hover { background: var(--purple-50); }
 
   .divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 1rem 0;
-    color: var(--text-muted);
-    font-size: 12px;
+    display: flex; align-items: center; gap: 12px;
+    margin: 1rem 0; color: var(--text-muted); font-size: 12px;
   }
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--gray-100);
-  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
 
   .admin-section-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin: 1.25rem 0 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-size: 13px; font-weight: 600; color: var(--text-muted);
+    margin: 1.25rem 0 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
   }
-
-  .settings-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  .settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
   .toast {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
+    position: fixed; bottom: 1.5rem; left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: var(--teal-800);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 99px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: transform 0.3s;
-    z-index: 9999;
-    white-space: nowrap;
+    background: var(--purple-800); color: white;
+    padding: 0.75rem 1.5rem; border-radius: 99px;
+    font-size: 14px; font-weight: 500; transition: transform 0.3s;
+    z-index: 9999; white-space: nowrap;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
   .tag {
-    display: inline-block;
-    background: var(--teal-50);
-    color: var(--teal-600);
-    border-radius: 99px;
-    padding: 2px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    margin-left: 6px;
+    display: inline-block; background: var(--purple-50);
+    color: var(--purple-700); border-radius: 99px;
+    padding: 2px 10px; font-size: 11px; font-weight: 600; margin-left: 6px;
   }
   .file-drop {
-    border: 2px dashed var(--gray-100);
-    border-radius: var(--radius-sm);
-    padding: 1.25rem;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.15s;
-    font-size: 13px;
-    color: var(--text-muted);
+    border: 2px dashed var(--gray-100); border-radius: var(--radius-sm);
+    padding: 1.25rem; text-align: center; cursor: pointer;
+    transition: border-color 0.15s; font-size: 13px; color: var(--text-muted);
   }
-  .file-drop:hover { border-color: var(--teal-400); color: var(--teal-600); }
+  .file-drop:hover { border-color: var(--purple-400); color: var(--purple-700); }
   .file-drop input { display: none; }
 
   .show-more {
-    text-align: center;
-    padding: 0.875rem;
+    text-align: center; padding: 0.875rem;
     border-top: 1px solid var(--gray-50);
-    font-size: 13px;
-    color: var(--teal-400);
-    cursor: pointer;
-    font-weight: 500;
+    font-size: 13px; color: var(--purple-600);
+    cursor: pointer; font-weight: 500;
   }
-  .show-more:hover { color: var(--teal-600); }
+  .show-more:hover { color: var(--purple-800); }
+
+  .pct-badge {
+    display: inline-block;
+    background: var(--purple-50);
+    color: var(--purple-700);
+    border-radius: 99px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-eyebrow" id="header-eyebrow">Wakaf Alumni</div>
-  <h1 id="campaign-title">Gerakan Wakaf Bersama</h1>
+  <div class="header-eyebrow" id="header-eyebrow">Wakaf Alumni 2011</div>
+  <h1 id="campaign-title">Wakaf Alumni 2011 Gontor Putri</h1>
   <div class="header-sub" id="campaign-sub">Bersama kita wujudkan amal jariyah yang terus mengalir</div>
 </div>
 
@@ -425,7 +412,16 @@
     <div class="stats-row">
       <div class="stat-box">
         <div class="stat-label">🎯 Target</div>
-        <div class="stat-value" id="target-display">Rp 50.000.000</div>
+        <div class="stat-value">
+          <div class="stat-value-edit" id="target-display-wrap">
+            <span id="target-display">Rp 50.000.000</span>
+            <span class="pct-badge" id="pct-badge">0%</span>
+            <button class="btn-edit-target" onclick="startEditTarget()" title="Edit target" id="edit-target-btn">✏️</button>
+          </div>
+          <input class="stat-edit-input" id="target-input" type="number" placeholder="50000000"
+            onkeydown="if(event.key==='Enter')saveTarget();if(event.key==='Escape')cancelEditTarget()"
+            onblur="saveTarget()">
+        </div>
       </div>
       <div class="stat-box">
         <div class="stat-label">👥 Donatur</div>
@@ -437,15 +433,15 @@
       </div>
     </div>
     <div class="deadline-box" id="deadline-box" style="display:none">
-      <span class="deadline-icon">🕐</span>
+      <span style="font-size:20px">🕐</span>
       <span class="deadline-text" id="deadline-text"></span>
     </div>
-  </div>
-
-  <!-- PAYMENT INFO -->
-  <div id="payment-section" style="display:none">
-    <div class="section-title">Rekening Tujuan</div>
-    <div class="payment-grid" id="payment-grid"></div>
+    <!-- CARA TRANSFER BUTTON -->
+    <div class="transfer-btn-wrap">
+      <button class="btn-transfer" onclick="openModal()">
+        🏦 Cara Transfer / Rekening Tujuan
+      </button>
+    </div>
   </div>
 
   <!-- DONATUR LIST -->
@@ -465,7 +461,8 @@
     <div class="admin-title">Login Admin</div>
     <div class="form-group">
       <label class="form-label">Password</label>
-      <input type="password" id="admin-password" placeholder="Masukkan password admin" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="admin-password" placeholder="Masukkan password admin"
+        onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="btn-primary" onclick="doLogin()">Masuk</button>
   </div>
@@ -477,7 +474,7 @@
     <div class="admin-section-title">Pengaturan Kampanye</div>
     <div class="form-group">
       <label class="form-label">Judul Kampanye</label>
-      <input type="text" id="set-title" placeholder="Gerakan Wakaf Bersama">
+      <input type="text" id="set-title" placeholder="Wakaf Alumni 2011 Gontor Putri">
     </div>
     <div class="settings-row">
       <div class="form-group">
@@ -496,8 +493,12 @@
     <button class="btn-secondary" onclick="saveSettings()">💾 Simpan Pengaturan</button>
 
     <div class="admin-section-title">Rekening Tujuan</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5">
+      Rekening ini akan tampil di modal "Cara Transfer" di halaman utama.
+    </div>
     <div id="rekening-list"></div>
     <button class="btn-secondary" onclick="addRekening()">+ Tambah Rekening</button>
+    <button class="btn-secondary" onclick="saveRekening()" style="margin-top:6px;background:var(--purple-50)">💾 Simpan Rekening</button>
 
     <div class="admin-section-title" style="margin-top:1.5rem">Import Data Donatur</div>
 
@@ -507,8 +508,9 @@
       <input type="text" id="gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/...">
     </div>
     <button class="btn-secondary" onclick="importGSheet()">📥 Import dari Google Sheets</button>
-    <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5">
-      Cara: File → Share → Publish to web → pilih CSV → copy link
+    <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6">
+      Cara publish: buka Google Sheets → File → Share → Publish to web → pilih sheet → pilih CSV → klik Publish → copy link-nya ke sini.<br>
+      <strong>Catatan:</strong> Setiap ada update di spreadsheet, kamu perlu klik Import ulang.
     </div>
 
     <div class="divider">atau upload file</div>
@@ -519,7 +521,7 @@
 
     <div style="margin-top:1.5rem">
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">
-        Format kolom yang dikenali: <code>nama</code>, <code>nominal</code>, <code>tanggal</code>, <code>kampus</code>, <code>no_wa</code>
+        Format kolom: <code>nama</code>, <code>nominal</code>, <code>tanggal</code>, <code>kampus</code>, <code>no_wa</code>
       </div>
     </div>
 
@@ -540,8 +542,8 @@
     </div>
     <div class="settings-row">
       <div class="form-group">
-        <label class="form-label">Kampus</label>
-        <input type="text" id="add-kampus" placeholder="Universitas ...">
+        <label class="form-label">Kampus/Kota</label>
+        <input type="text" id="add-kampus" placeholder="Universitas / Kota">
       </div>
       <div class="form-group">
         <label class="form-label">No. WA</label>
@@ -549,20 +551,30 @@
       </div>
     </div>
     <button class="btn-primary" onclick="addManual()">+ Tambah Donatur</button>
-    <button class="btn-secondary" onclick="clearData()" style="margin-top:12px;color:#A32D2D;border-color:#F7C1C1">🗑 Hapus Semua Data</button>
+    <button class="btn-secondary" onclick="clearData()" style="margin-top:12px;color:#A32D2D;border-color:#F7C1C1">🗑 Hapus Semua Data Donatur</button>
   </div>
 
+</div>
+
+<!-- REKENING MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏦 Rekening Tujuan Wakaf</div>
+    <div id="modal-rekening-list"></div>
+    <button class="modal-close" onclick="closeModal()">Tutup</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const ADMIN_PASS = 'alumni685';
+const ADMIN_PASS = 'wakaf2011';
 let donors = [];
 let settings = {
-  title: 'Gerakan Wakaf Bersama',
+  title: 'Wakaf Alumni 2011 Gontor Putri',
   sub: 'Bersama kita wujudkan amal jariyah yang terus mengalir',
-  eyebrow: 'Wakaf Alumni',
+  eyebrow: 'Wakaf Alumni 2011',
   target: 50000000,
   totalAlumni: 0,
   deadline: '',
@@ -572,6 +584,7 @@ let settings = {
   ]
 };
 let showAll = false;
+let editingTarget = false;
 
 function load() {
   const d = localStorage.getItem('wakaf_donors');
@@ -591,7 +604,7 @@ function fmt(n) {
 }
 
 function initials(name) {
-  return name.trim().split(' ').slice(0,2).map(w=>w[0]?.toUpperCase()||'').join('');
+  return name.trim().split(' ').slice(0,2).map(w => w[0]?.toUpperCase() || '').join('');
 }
 
 function render() {
@@ -599,11 +612,12 @@ function render() {
   document.getElementById('campaign-sub').textContent = settings.sub;
   document.getElementById('header-eyebrow').textContent = settings.eyebrow;
 
-  const total = donors.reduce((s,d) => s + (parseFloat(d.nominal)||0), 0);
-  const pct = settings.target > 0 ? Math.min(100, (total/settings.target)*100) : 0;
+  const total = donors.reduce((s, d) => s + (parseFloat(d.nominal) || 0), 0);
+  const pct = settings.target > 0 ? Math.min(100, (total / settings.target) * 100) : 0;
 
   document.getElementById('total-dana').textContent = fmt(total);
   document.getElementById('target-display').textContent = fmt(settings.target);
+  document.getElementById('pct-badge').textContent = pct.toFixed(1) + '%';
   document.getElementById('donatur-count').textContent = donors.length;
   document.getElementById('donatur-tag').textContent = donors.length;
 
@@ -620,67 +634,83 @@ function render() {
     const days = Math.ceil((new Date(settings.deadline) - new Date()) / 86400000);
     if (days > 0) {
       document.getElementById('deadline-box').style.display = '';
-      document.getElementById('deadline-text').textContent = days + ' Hari Lagi (Sampai ' + new Date(settings.deadline).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) + ')';
+      document.getElementById('deadline-text').textContent = days + ' Hari Lagi (Sampai ' +
+        new Date(settings.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + ')';
     }
   }
 
-  renderPayment();
   renderDonors();
 }
 
-function renderPayment() {
-  const grid = document.getElementById('payment-grid');
-  const sec = document.getElementById('payment-section');
-  if (!settings.rekening || settings.rekening.length === 0) { sec.style.display='none'; return; }
-  sec.style.display = '';
-  grid.innerHTML = settings.rekening.map(r => `
-    <div class="payment-card" onclick="copyText('${r.no}')">
-      <div class="payment-bank">${r.bank}</div>
-      <div class="payment-no">${r.no}</div>
-      <div class="payment-name">${r.nama}</div>
-      <div class="copy-hint">Tap untuk salin</div>
-    </div>
-  `).join('');
+/* ---- INLINE TARGET EDIT ---- */
+function startEditTarget() {
+  editingTarget = true;
+  document.getElementById('target-display').style.display = 'none';
+  document.getElementById('pct-badge').style.display = 'none';
+  document.getElementById('edit-target-btn').style.display = 'none';
+  const input = document.getElementById('target-input');
+  input.value = settings.target;
+  input.classList.add('visible');
+  input.focus();
+  input.select();
 }
 
-function renderDonors() {
-  const list = document.getElementById('donatur-list');
-  const sorted = [...donors].sort((a,b) => (parseFloat(b.nominal)||0) - (parseFloat(a.nominal)||0));
-  const shown = showAll ? sorted : sorted.slice(0,8);
+function saveTarget() {
+  if (!editingTarget) return;
+  editingTarget = false;
+  const val = parseFloat(document.getElementById('target-input').value);
+  if (val > 0) { settings.target = val; save(); }
+  document.getElementById('target-input').classList.remove('visible');
+  document.getElementById('target-display').style.display = '';
+  document.getElementById('pct-badge').style.display = '';
+  document.getElementById('edit-target-btn').style.display = '';
+  render();
+  toast('Target diperbarui!');
+}
 
-  if (donors.length === 0) {
-    list.innerHTML = '<div class="empty-state">Belum ada data donatur.<br>Import dari spreadsheet di bawah.</div>';
-    document.getElementById('show-more').style.display = 'none';
+function cancelEditTarget() {
+  editingTarget = false;
+  document.getElementById('target-input').classList.remove('visible');
+  document.getElementById('target-display').style.display = '';
+  document.getElementById('pct-badge').style.display = '';
+  document.getElementById('edit-target-btn').style.display = '';
+}
+
+/* ---- MODAL REKENING ---- */
+function openModal() {
+  renderModalRekening();
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+function renderModalRekening() {
+  const el = document.getElementById('modal-rekening-list');
+  if (!settings.rekening || settings.rekening.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--text-muted);font-size:14px">Belum ada rekening ditambahkan.</div>';
     return;
   }
-
-  list.innerHTML = shown.map(d => `
-    <div class="donatur-item">
-      <div class="donatur-avatar">${initials(d.nama || '?')}</div>
-      <div class="donatur-info">
-        <div class="donatur-name">${d.nama || '-'}</div>
-        <div class="donatur-meta">${d.kampus||''} ${d.tanggal ? '· ' + new Date(d.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'short'}) : ''}</div>
+  el.innerHTML = settings.rekening.map(r => `
+    <div class="rekening-card" onclick="copyText('${r.no}', '${r.bank}')">
+      <div class="rek-info">
+        <div class="rek-bank">${r.bank}</div>
+        <div class="rek-no">${r.no}</div>
+        <div class="rek-nama">a.n. ${r.nama}</div>
       </div>
-      <div class="donatur-nominal">${fmt(d.nominal||0)}</div>
+      <div class="rek-copy">📋 Salin</div>
     </div>
   `).join('');
-
-  const sm = document.getElementById('show-more');
-  if (donors.length > 8) {
-    sm.style.display = '';
-    sm.textContent = showAll ? 'Tampilkan lebih sedikit ↑' : `Lihat semua ${donors.length} donatur ↓`;
-  } else {
-    sm.style.display = 'none';
-  }
 }
 
-function toggleShowAll() {
-  showAll = !showAll;
-  renderDonors();
-}
-
-function copyText(t) {
-  navigator.clipboard?.writeText(t).then(() => toast('Nomor rekening disalin!')).catch(() => toast(t));
+function copyText(no, bank) {
+  navigator.clipboard?.writeText(no)
+    .then(() => toast('No. rekening ' + bank + ' disalin!'))
+    .catch(() => toast(no));
 }
 
 function toast(msg) {
@@ -690,6 +720,7 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
+/* ---- ADMIN ---- */
 function toggleAdminLogin() {
   const lp = document.getElementById('login-panel');
   const ap = document.getElementById('admin-panel');
@@ -722,53 +753,97 @@ function saveSettings() {
   settings.target = parseFloat(document.getElementById('set-target').value) || settings.target;
   settings.totalAlumni = parseInt(document.getElementById('set-total-alumni').value) || 0;
   settings.deadline = document.getElementById('set-deadline').value || '';
-  save();
-  render();
+  save(); render();
   toast('Pengaturan disimpan!');
 }
 
 function renderRekeningAdmin() {
   const el = document.getElementById('rekening-list');
-  el.innerHTML = (settings.rekening||[]).map((r,i) => `
+  el.innerHTML = (settings.rekening || []).map((r, i) => `
     <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center">
-      <input type="text" value="${r.bank}" placeholder="Bank" onchange="updateRek(${i},'bank',this.value)">
-      <input type="text" value="${r.no}" placeholder="No. Rekening" onchange="updateRek(${i},'no',this.value)">
+      <input type="text" value="${r.bank}" placeholder="Nama Bank" id="rek-bank-${i}">
+      <input type="text" value="${r.no}" placeholder="No. Rekening" id="rek-no-${i}">
       <button onclick="removeRek(${i})" style="background:none;border:none;color:#A32D2D;cursor:pointer;font-size:18px;padding:0 4px">×</button>
-      <input type="text" value="${r.nama}" placeholder="Nama pemilik" onchange="updateRek(${i},'nama',this.value)" style="grid-column:1/3">
+      <input type="text" value="${r.nama}" placeholder="Nama pemilik rekening" id="rek-nama-${i}" style="grid-column:1/3">
     </div>
   `).join('');
 }
 
-function updateRek(i, key, val) { settings.rekening[i][key] = val; save(); }
-function removeRek(i) { settings.rekening.splice(i,1); save(); renderRekeningAdmin(); renderPayment(); }
+function saveRekening() {
+  const count = settings.rekening.length;
+  for (let i = 0; i < count; i++) {
+    settings.rekening[i].bank = document.getElementById('rek-bank-' + i)?.value || '';
+    settings.rekening[i].no   = document.getElementById('rek-no-' + i)?.value || '';
+    settings.rekening[i].nama = document.getElementById('rek-nama-' + i)?.value || '';
+  }
+  save();
+  toast('Rekening disimpan!');
+}
+
+function removeRek(i) { settings.rekening.splice(i, 1); save(); renderRekeningAdmin(); }
 function addRekening() {
-  settings.rekening.push({ bank:'', no:'', nama:'' });
+  settings.rekening.push({ bank: '', no: '', nama: '' });
   renderRekeningAdmin();
 }
 
+/* ---- DONORS ---- */
+function renderDonors() {
+  const list = document.getElementById('donatur-list');
+  const sorted = [...donors].sort((a, b) => (parseFloat(b.nominal) || 0) - (parseFloat(a.nominal) || 0));
+  const shown = showAll ? sorted : sorted.slice(0, 8);
+
+  if (donors.length === 0) {
+    list.innerHTML = '<div class="empty-state">Belum ada data donatur.<br>Import dari spreadsheet di bawah.</div>';
+    document.getElementById('show-more').style.display = 'none';
+    return;
+  }
+
+  list.innerHTML = shown.map(d => `
+    <div class="donatur-item">
+      <div class="donatur-avatar">${initials(d.nama || '?')}</div>
+      <div class="donatur-info">
+        <div class="donatur-name">${d.nama || '-'}</div>
+        <div class="donatur-meta">${d.kampus || ''} ${d.tanggal ? '· ' + new Date(d.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : ''}</div>
+      </div>
+      <div class="donatur-nominal">${fmt(d.nominal || 0)}</div>
+    </div>
+  `).join('');
+
+  const sm = document.getElementById('show-more');
+  if (donors.length > 8) {
+    sm.style.display = '';
+    sm.textContent = showAll ? 'Tampilkan lebih sedikit ↑' : `Lihat semua ${donors.length} donatur ↓`;
+  } else {
+    sm.style.display = 'none';
+  }
+}
+
+function toggleShowAll() { showAll = !showAll; renderDonors(); }
+
+/* ---- IMPORT ---- */
 function normalizeKey(k) {
   const map = {
-    'nama':'nama','name':'nama','nama alumni':'nama',
-    'nominal':'nominal','amount':'nominal','jumlah':'nominal','donasi':'nominal',
-    'tanggal':'tanggal','date':'tanggal','tgl':'tanggal',
-    'kampus':'kampus','universitas':'kampus','instansi':'kampus',
-    'no wa':'no_wa','nowa':'no_wa','wa':'no_wa','whatsapp':'no_wa','no. wa':'no_wa','no_wa':'no_wa','phone':'no_wa'
+    'nama': 'nama', 'name': 'nama', 'nama alumni': 'nama',
+    'nominal': 'nominal', 'amount': 'nominal', 'jumlah': 'nominal', 'donasi': 'nominal',
+    'tanggal': 'tanggal', 'date': 'tanggal', 'tgl': 'tanggal',
+    'kampus': 'kampus', 'universitas': 'kampus', 'instansi': 'kampus', 'kota': 'kampus',
+    'no wa': 'no_wa', 'nowa': 'no_wa', 'wa': 'no_wa', 'whatsapp': 'no_wa',
+    'no. wa': 'no_wa', 'no_wa': 'no_wa', 'phone': 'no_wa'
   };
   return map[k.toLowerCase().trim()] || k.toLowerCase().trim();
 }
 
 function parseRows(rows) {
-  if (!rows || rows.length < 2) { toast('Data kosong atau formatnya tidak dikenali.'); return; }
-  const headers = rows[0].map(h => normalizeKey(String(h||'')));
+  if (!rows || rows.length < 2) { toast('Data kosong atau format tidak dikenali.'); return; }
+  const headers = rows[0].map(h => normalizeKey(String(h || '')));
   const parsed = rows.slice(1).map(row => {
     const obj = {};
-    headers.forEach((h,i) => { if(h) obj[h] = String(row[i]||'').trim(); });
+    headers.forEach((h, i) => { if (h) obj[h] = String(row[i] || '').trim(); });
     return obj;
-  }).filter(r => r.nama && r.nama !== '' && (r.nominal !== '' && r.nominal !== undefined));
-  parsed.forEach(r => { r.nominal = parseFloat(String(r.nominal).replace(/[^0-9.]/g,''))||0; });
+  }).filter(r => r.nama && r.nama !== '' && r.nominal !== '' && r.nominal !== undefined);
+  parsed.forEach(r => { r.nominal = parseFloat(String(r.nominal).replace(/[^0-9.]/g, '')) || 0; });
   donors = parsed;
-  save();
-  render();
+  save(); render();
   toast(parsed.length + ' donatur berhasil diimport!');
 }
 
@@ -779,7 +854,7 @@ function importGSheet() {
   const match = url.match(/\/spreadsheets\/d\/([^/]+)/);
   if (match) {
     const gid = url.match(/[?&]gid=(\d+)/);
-    csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv${gid ? '&gid='+gid[1] : ''}`;
+    csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv${gid ? '&gid=' + gid[1] : ''}`;
   }
   toast('Mengambil data...');
   fetch(csvUrl)
@@ -788,7 +863,7 @@ function importGSheet() {
       const result = Papa.parse(text, { skipEmptyLines: true });
       parseRows(result.data);
     })
-    .catch(() => toast('Gagal mengambil data. Pastikan link sudah benar dan sheet sudah dipublish.'));
+    .catch(() => toast('Gagal mengambil data. Pastikan sheet sudah di-publish sebagai CSV.'));
 }
 
 function handleFileUpload(input) {
@@ -796,17 +871,13 @@ function handleFileUpload(input) {
   if (!file) return;
   const ext = file.name.split('.').pop().toLowerCase();
   if (ext === 'csv') {
-    Papa.parse(file, {
-      complete: r => parseRows(r.data),
-      skipEmptyLines: true
-    });
+    Papa.parse(file, { complete: r => parseRows(r.data), skipEmptyLines: true });
   } else if (ext === 'xlsx' || ext === 'xls') {
     const reader = new FileReader();
     reader.onload = e => {
       const wb = XLSX.read(e.target.result, { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      parseRows(rows);
+      parseRows(XLSX.utils.sheet_to_json(ws, { header: 1 }));
     };
     reader.readAsArrayBuffer(file);
   }
@@ -817,23 +888,20 @@ function addManual() {
   const nominal = parseFloat(document.getElementById('add-nominal').value) || 0;
   if (!nama) { toast('Nama wajib diisi.'); return; }
   donors.push({
-    nama,
-    nominal,
+    nama, nominal,
     tanggal: document.getElementById('add-tanggal').value,
     kampus: document.getElementById('add-kampus').value.trim(),
     no_wa: document.getElementById('add-wa').value.trim()
   });
-  ['add-nama','add-nominal','add-tanggal','add-kampus','add-wa'].forEach(id => document.getElementById(id).value='');
-  save();
-  render();
+  ['add-nama', 'add-nominal', 'add-tanggal', 'add-kampus', 'add-wa'].forEach(id => document.getElementById(id).value = '');
+  save(); render();
   toast(nama + ' ditambahkan!');
 }
 
 function clearData() {
-  if (!confirm('Hapus semua data donatur? Pengaturan tidak akan dihapus.')) return;
+  if (!confirm('Hapus semua data donatur? Pengaturan tidak akan terhapus.')) return;
   donors = [];
-  save();
-  render();
+  save(); render();
   toast('Data donatur dihapus.');
 }
 
